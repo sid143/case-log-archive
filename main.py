@@ -15,7 +15,6 @@ DB_CONFIG = {
    "port": int(os.environ.get("DB_PORT", 5432)),
    "dbname": os.environ.get("DB_NAME"),
 }
-
 def get_connection():
    return psycopg2.connect(
        **DB_CONFIG,
@@ -39,10 +38,9 @@ def insert_records(records: List[CaseLogIn]) -> None:
        conn = get_connection()
        cur = conn.cursor()
        sql = """
-       INSERT INTO case_log_archive
+       INSERT INTO public.caselog_archive
        (sf_id, case_id, name, comments)
        VALUES (%s, %s, %s, %s)
-       ON CONFLICT (case_id) DO NOTHING
        """
        data = [
            (r.sf_id, r.caseId, r.name, r.comments)
@@ -50,11 +48,10 @@ def insert_records(records: List[CaseLogIn]) -> None:
        ]
        execute_batch(cur, sql, data, page_size=100)
        conn.commit()
-   except psycopg2.Error as e:
+   except psycopg2.Error:
        if conn:
            conn.rollback()
-       # re-raise so FastAPI can return 500
-       raise e
+       raise
    finally:
        if cur:
            cur.close()

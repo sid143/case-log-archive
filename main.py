@@ -7,7 +7,7 @@ import os
 app = FastAPI()
 DB_CONFIG = {
    "host": os.environ["DB_HOST"],
-   "dbname": "caselog_archive",
+   "dbname": "postgres",
    "user": "postgres",
    "password": os.environ["DB_PASSWORD"],
    "port": 5432
@@ -58,4 +58,5 @@ def archive_case_logs(payload: List[dict]):
        "received": len(payload),
        "inserted": len(payload) - len(failed),
        "failed": failed
+
    }

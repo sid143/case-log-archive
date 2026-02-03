@@ -7,10 +7,10 @@ import os
 app = FastAPI()
 DB_CONFIG = {
    "host": os.environ["DB_HOST"],
-   "dbname": "postgres",
-   "user": "postgres",
+   "dbname": os.environ.get("DB_NAME", "postgres"),
+   "user": os.environ.get("DB_USER", "postgres"),
    "password": os.environ["DB_PASSWORD"],
-   "port": 5432
+   "port": int(os.environ.get("DB_PORT", 5432))
 }
 def get_connection():
    return psycopg2.connect(**DB_CONFIG)
@@ -60,3 +60,4 @@ def archive_case_logs(payload: List[dict]):
        "failed": failed
 
    }
+

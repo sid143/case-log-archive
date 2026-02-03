@@ -13,7 +13,10 @@ DB_CONFIG = {
    "port": int(os.environ.get("DB_PORT", 5432))
 }
 def get_connection():
-   return psycopg2.connect(**DB_CONFIG)
+   return psycopg2.connect(
+   **DB_CONFIG,
+   sslmode="require"
+)
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def insert_records(records):
    conn = get_connection()
@@ -60,4 +63,5 @@ def archive_case_logs(payload: List[dict]):
        "failed": failed
 
    }
+
 

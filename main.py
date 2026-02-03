@@ -25,6 +25,7 @@ def get_connection():
 # Salesforce Wrapper Model
 # -------------------------
 class CaseLogIn(BaseModel):
+   sf_id : str
    caseId: str
    name: str
    comments: Optional[str] = None
@@ -37,12 +38,12 @@ def insert_records(records: List[CaseLogIn]):
    cur = conn.cursor()
    sql = """
        INSERT INTO case_log_archive
-       (case_id, name, comments)
+       (sf_id, case_id, name, comments)
        VALUES (%s, %s, %s)
        ON CONFLICT (case_id) DO NOTHING
    """
    data = [
-       (r.caseId, r.name, r.comments)
+       (r.sf_id, r.caseId, r.name, r.comments)
        for r in records
    ]
    execute_batch(cur, sql, data, page_size=100)
@@ -70,3 +71,4 @@ def archive_case_logs(records: List[CaseLogIn]):
 @app.get("/")
 def health():
    return {"status": "ok"}
+

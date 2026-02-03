@@ -25,9 +25,9 @@ def get_connection():
 # -------------------------
 class CaseLogIn(BaseModel):
    sf_id: str
-   caseId: str
+   caseId: Optional[str] = None      # ✅ allows null
    name: str
-   comments: Optional[str] = None
+   comments: Optional[str] = None    # ✅ allows null
 # -------------------------
 # Insert Logic (No Retry)
 # -------------------------
@@ -38,7 +38,7 @@ def insert_records(records: List[CaseLogIn]) -> None:
        conn = get_connection()
        cur = conn.cursor()
        sql = """
-       INSERT INTO public.caselog_archive
+       INSERT INTO caselog_archive
        (sf_id, case_id, name, comments)
        VALUES (%s, %s, %s, %s)
        """
@@ -48,10 +48,10 @@ def insert_records(records: List[CaseLogIn]) -> None:
        ]
        execute_batch(cur, sql, data, page_size=100)
        conn.commit()
-   except psycopg2.Error:
+   except psycopg2.Error as e:
        if conn:
            conn.rollback()
-       raise
+       raise e
    finally:
        if cur:
            cur.close()
